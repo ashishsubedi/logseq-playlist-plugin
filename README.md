@@ -6,6 +6,8 @@ note blocks for single videos or the whole playlist.
 
 No inline player. Use `Open in YouTube` for playback.
 
+![YouTube Playlist Card in Logseq](assets/card-overview.png)
+
 ## Features
 
 - Compact card: thumbnail, `PLAYLIST` badge, video-count overlay, title, channel.
@@ -21,6 +23,12 @@ No inline player. Use `Open in YouTube` for playback.
 - Private or deleted playlists show a fallback card with `Open in YouTube`.
 - API results are cached locally to save quota.
 - Light and dark theme support via Logseq CSS variables.
+
+### Tracklist & Quick Search
+
+| Expandable Tracklist | Fast Title Search (`/Insert playlist video`) |
+| :---: | :---: |
+| ![Expandable Tracklist](assets/tracklist-expanded.png) | ![Search Modal](assets/search-modal.png) |
 
 ## Known limits
 
