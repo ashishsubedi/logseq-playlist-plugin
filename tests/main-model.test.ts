@@ -23,6 +23,8 @@ function makeLogseq() {
       appendBlockInPage: vi.fn().mockResolvedValue({ uuid: "ap" }),
       insertAtEditingCursor: vi.fn().mockResolvedValue(undefined),
       getCurrentPage: vi.fn().mockResolvedValue({ name: "journal" }),
+      getBlock: vi.fn().mockResolvedValue({ content: "" }),
+      updateBlock: vi.fn().mockResolvedValue(undefined),
     },
     UI: { showMsg: vi.fn().mockResolvedValue(undefined) },
   };
@@ -45,7 +47,10 @@ function resetAll() {
   logseqMock.Editor.insertBatchBlock.mockResolvedValue([{ uuid: "n1" }]);
   logseqMock.Editor.appendBlockInPage.mockResolvedValue({ uuid: "ap" });
   logseqMock.Editor.getCurrentPage.mockResolvedValue({ name: "journal" });
+  logseqMock.Editor.getBlock.mockResolvedValue({ content: "" });
   logseqMock.App.openExternalLink.mockResolvedValue(undefined);
+  logseqMock.showSettingsUI.mockResolvedValue(undefined);
+  logseqMock.settings = {};
 }
 
 beforeEach(() => resetAll());
@@ -277,5 +282,148 @@ describe("renderCard", () => {
     );
     expect(logseqMock.provideUI).not.toHaveBeenCalled();
     expect(fetch as unknown as ReturnType<typeof vi.fn>).not.toHaveBeenCalled();
+  });
+
+  it("renders the enriched V2 card when an API key is set", async () => {
+    logseqMock.settings = { youtubeApiKey: "test-key" };
+    (fetch as unknown as ReturnType<typeof vi.fn>).mockImplementation(
+      async (url: string) => {
+        if (String(url).includes("/playlists?")) {
+          return {
+            ok: true,
+            json: async () => ({
+              items: [
+                {
+                  snippet: {
+                    title: "CS50x",
+                    channelTitle: "CS50",
+                    thumbnails: { high: { url: "https://i.ytimg.com/t.jpg" } },
+                  },
+                  contentDetails: { itemCount: 13 },
+                },
+              ],
+            }),
+          };
+        }
+        return {
+          ok: true,
+          json: async () => ({
+            items: [
+              {
+                snippet: {
+                  title: "Intro",
+                  position: 0,
+                  resourceId: { videoId: "v1" },
+                  thumbnails: { default: { url: "https://i.ytimg.com/v1.jpg" } },
+                },
+              },
+            ],
+          }),
+        };
+      }
+    );
+    await main.renderCard("slot-9", "uuid-9", CS149);
+    const arg = logseqMock.provideUI.mock.calls[0][0] as { template: string };
+    expect(arg.template).toContain("13");
+    expect(arg.template).toContain("VIDEOS");
+  });
+});
+
+describe("model: openSettings and closeSearchModal", () => {
+  it("opens the settings UI", () => {
+    const model = main.createModel();
+    model.openSettings();
+    expect(logseqMock.showSettingsUI).toHaveBeenCalledTimes(1);
+  });
+
+  it("clears the search modal", () => {
+    const model = main.createModel();
+    model.closeSearchModal();
+    expect(logseqMock.provideUI).toHaveBeenCalledWith({
+      key: "ytpl-search-modal",
+      template: "",
+    });
+  });
+});
+
+describe("slot wiring: handleMacroRendererSlotted", () => {
+  function oembedOk() {
+    return {
+      ok: true,
+      json: async () => ({
+        title: "CS50x 2025",
+        author_name: "CS50",
+        thumbnail_url: "https://i.ytimg.com/vi/x/hqdefault.jpg",
+      }),
+    };
+  }
+
+  it("renders the card when a playlist macro is slotted", async () => {
+    (fetch as unknown as ReturnType<typeof vi.fn>).mockResolvedValue(oembedOk());
+    main.handleMacroRendererSlotted("slot-7", {
+      arguments: [":yt-playlist", CS149],
+      uuid: "uuid-7",
+    });
+    await vi.waitFor(() =>
+      expect(logseqMock.provideUI).toHaveBeenCalledTimes(1)
+    );
+    const arg = logseqMock.provideUI.mock.calls[0][0] as {
+      key: string;
+      template: string;
+    };
+    expect(arg.key).toBe(
+      "ytpl-PLosJChMwPtizq2swoD8DZXc567PJ9YKnn-slot-7"
+    );
+    expect(arg.template).toContain("CS50x 2025");
+  });
+
+  it("ignores single-video macros", () => {
+    main.handleMacroRendererSlotted("slot-7", {
+      arguments: ["https://www.youtube.com/watch?v=solo"],
+      uuid: "uuid-7",
+    });
+    expect(logseqMock.provideUI).not.toHaveBeenCalled();
+    expect(fetch as unknown as ReturnType<typeof vi.fn>).not.toHaveBeenCalled();
+  });
+});
+
+describe("slash commands", () => {
+  it("inserts the starter playlist macro", async () => {
+    await main.handleSlashPlaylistCard();
+    expect(logseqMock.Editor.insertAtEditingCursor).toHaveBeenCalledWith(
+      "{{renderer :yt-playlist, https://www.youtube.com/playlist?list=}}"
+    );
+  });
+
+  it("opens the video search modal", async () => {
+    await main.handleSlashInsertVideo();
+    expect(logseqMock.provideUI).toHaveBeenCalledWith(
+      expect.objectContaining({ key: "ytpl-search-modal" })
+    );
+    const arg = logseqMock.provideUI.mock.calls[0][0] as { template: string };
+    expect(arg.template).toContain("ytpl-search-input");
+    expect(arg.template).toContain("ytpl-search-results");
+  });
+});
+
+describe("block context menu: handleBlockContextMenu", () => {
+  it("converts a block playlist link to a renderer macro", async () => {
+    logseqMock.Editor.getBlock.mockResolvedValue({
+      content: `watch this ${CS149} later`,
+    });
+    await main.handleBlockContextMenu({ uuid: "b1" });
+    expect(logseqMock.Editor.updateBlock).toHaveBeenCalledWith(
+      "b1",
+      `{{renderer :yt-playlist, ${CS149}}}`
+    );
+  });
+
+  it("warns when the block has no playlist URL", async () => {
+    logseqMock.Editor.getBlock.mockResolvedValue({ content: "just text" });
+    await main.handleBlockContextMenu({ uuid: "b1" });
+    expect(logseqMock.Editor.updateBlock).not.toHaveBeenCalled();
+    expect(logseqMock.UI.showMsg).toHaveBeenCalledWith(
+      "No playlist URL in this block."
+    );
   });
 });

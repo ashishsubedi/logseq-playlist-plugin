@@ -50,15 +50,23 @@ export async function renderCard(slot: string, blockUuid: string, url: string) {
   }
 }
 
+export function handleMacroRendererSlotted(
+  slot: string,
+  payload: { arguments?: string[]; uuid?: string }
+) {
+  // ponytail: single-video URLs return null here, native handling stays intact
+  const url = selectPlaylistUrl(rendererArgs(payload));
+  if (!url) return;
+  const blockUuid = payload.uuid ?? slot;
+  void renderCard(slot, blockUuid, url);
+}
+
 function registerRenderer() {
   logseq.App.onMacroRendererSlotted(({ slot, payload }) => {
-    const args = rendererArgs(payload as unknown as { arguments?: string[] });
-    // ponytail: single-video URLs return null here, native handling stays intact
-    const url = selectPlaylistUrl(args);
-    if (!url) return;
-    const blockUuid =
-      (payload as unknown as { uuid?: string }).uuid ?? slot;
-    void renderCard(slot, blockUuid, url);
+    handleMacroRendererSlotted(
+      slot,
+      payload as unknown as { arguments?: string[]; uuid?: string }
+    );
   });
 }
 
@@ -193,7 +201,7 @@ export function createModel() {
   };
 }
 
-function openSearchModal() {
+export function openSearchModal() {
   const modalTemplate = `
     <div class="ytpl-modal-overlay" data-on-click="closeSearchModal">
       <div class="ytpl-modal" onclick="event.stopPropagation()">
@@ -251,6 +259,30 @@ function openSearchModal() {
   }, 100);
 }
 
+export async function handleSlashPlaylistCard() {
+  await logseq.Editor.insertAtEditingCursor(
+    "{{renderer :yt-playlist, https://www.youtube.com/playlist?list=}}"
+  );
+}
+
+export async function handleSlashInsertVideo() {
+  openSearchModal();
+}
+
+export async function handleBlockContextMenu(e: { uuid: string }) {
+  const block = await logseq.Editor.getBlock(e.uuid);
+  const text = (block as { content?: string } | null)?.content ?? "";
+  const m = text.match(/https?:\/\/[^\s)]+/);
+  if (!m || !parsePlaylistId(m[0])) {
+    await logseq.UI.showMsg("No playlist URL in this block.");
+    return;
+  }
+  await logseq.Editor.updateBlock(
+    e.uuid,
+    `{{renderer :yt-playlist, ${m[0]}}}`
+  );
+}
+
 function main() {
   logseq.useSettingsSchema([
     {
@@ -273,34 +305,19 @@ function main() {
   registerRenderer();
   registerModel();
 
-  logseq.Editor.registerSlashCommand("YouTube playlist card", async () => {
-    await logseq.Editor.insertAtEditingCursor(
-      "{{renderer :yt-playlist, https://www.youtube.com/playlist?list=}}"
-    );
-  });
+  logseq.Editor.registerSlashCommand(
+    "YouTube playlist card",
+    handleSlashPlaylistCard
+  );
 
   logseq.Editor.registerSlashCommand(
     "Insert playlist video",
-    async () => {
-      openSearchModal();
-    }
+    handleSlashInsertVideo
   );
 
   logseq.Editor.registerBlockContextMenuItem(
     "Playlist → card",
-    async (e: { uuid: string }) => {
-      const block = await logseq.Editor.getBlock(e.uuid);
-      const text = (block as { content?: string } | null)?.content ?? "";
-      const m = text.match(/https?:\/\/[^\s)]+/);
-      if (!m || !parsePlaylistId(m[0])) {
-        await logseq.UI.showMsg("No playlist URL in this block.");
-        return;
-      }
-      await logseq.Editor.updateBlock(
-        e.uuid,
-        `{{renderer :yt-playlist, ${m[0]}}}`
-      );
-    }
+    handleBlockContextMenu
   );
 
   watchVideoMacros();
