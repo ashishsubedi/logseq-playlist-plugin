@@ -1,6 +1,6 @@
 {
   "name": "logseq-yt-playlist-card",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Compact YouTube playlist cards with note-block actions",
   "main": "dist/index.html",
   "logseq": {
