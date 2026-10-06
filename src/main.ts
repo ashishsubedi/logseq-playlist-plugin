@@ -2,9 +2,11 @@ import "@logseq/libs";
 import css from "./style.css?raw";
 import {
   cardTemplate,
+  escapeHtml,
   fallbackTemplate,
   fetchEnrichedPlaylistMeta,
   findConvertibleBlocks,
+  isSafeExternalUrl,
   noteBlockContent,
   parsePlaylistId,
   readCache,
@@ -26,22 +28,26 @@ function rendererArgs(payload: { arguments?: string[] }): string[] {
 async function renderCard(slot: string, blockUuid: string, url: string) {
   const id = parsePlaylistId(url);
   if (!id) return;
-  const apiKey = getApiKey();
-  const meta = await fetchEnrichedPlaylistMeta(url, apiKey);
-  const key = `ytpl-${id}-${slot}`;
-  const template = meta
-    ? cardTemplate(meta, blockUuid, false)
-    : fallbackTemplate(url);
-  logseq.provideUI({
-    key,
-    slot,
-    reset: true,
-    template,
-    style: {
-      height: "fit-content",
-      minHeight: "0",
-    },
-  });
+  try {
+    const apiKey = getApiKey();
+    const meta = await fetchEnrichedPlaylistMeta(url, apiKey);
+    const key = `ytpl-${id}-${slot}`;
+    const template = meta
+      ? cardTemplate(meta, blockUuid, false)
+      : fallbackTemplate(url);
+    logseq.provideUI({
+      key,
+      slot,
+      reset: true,
+      template,
+      style: {
+        height: "fit-content",
+        minHeight: "0",
+      },
+    });
+  } catch (err) {
+    console.error("[yt-playlist] renderCard failed", err);
+  }
 }
 
 function registerRenderer() {
@@ -70,12 +76,12 @@ async function addNote(slotUuid: string, url: string, title: string) {
 function registerModel() {
   logseq.provideModel({
     async openYouTube(e: { dataset: { url?: string } }) {
-      const url = e.dataset.url;
-      if (!url) return;
+      const url = (e.dataset.url ?? "").trim();
+      if (!url || !isSafeExternalUrl(url)) return;
       try {
         await logseq.App.openExternalLink(url);
       } catch {
-        window.open(url, "_blank");
+        window.open(url, "_blank", "noopener");
       }
     },
     openSettings() {
@@ -121,8 +127,12 @@ function registerModel() {
         return;
       }
       for (const item of meta.items) {
-        const content = noteBlockContent(item.title, item.videoUrl);
-        await logseq.Editor.insertBlockAsChild(slotUuid, content);
+        try {
+          const content = noteBlockContent(item.title, item.videoUrl);
+          await logseq.Editor.insertBlockAsChild(slotUuid, content);
+        } catch (err) {
+          console.error("[yt-playlist] importAllVideos skipped one item", err);
+        }
       }
       await logseq.UI.showMsg(`Imported ${meta.items.length} videos as notes.`);
     },
@@ -130,7 +140,7 @@ function registerModel() {
       dataset: { url?: string; title?: string };
     }) {
       const { url, title } = e.dataset;
-      if (!url) return;
+      if (!url || !isSafeExternalUrl(url)) return;
       const content = noteBlockContent(title ?? "Video", url);
       await logseq.Editor.insertAtEditingCursor(content);
       logseq.provideUI({ key: "ytpl-search-modal", template: "" });
@@ -179,11 +189,11 @@ function openSearchModal() {
       resultsContainer.innerHTML = matches
         .map(
           (m) => `
-        <div class="ytpl-search-item" data-on-click="insertSearchResult" data-url="${m.video.videoUrl}" data-title="${m.video.title.replace(/"/g, "&quot;")}">
+        <div class="ytpl-search-item" data-on-click="insertSearchResult" data-url="${escapeHtml(m.video.videoUrl)}" data-title="${escapeHtml(m.video.title)}">
           <span style="color: #ff0033;">▶</span>
           <div style="flex: 1; min-width: 0;">
-            <div style="font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${m.video.title}</div>
-            <div style="font-size: 11px; color: var(--ls-secondary-text-color, #888);">${m.playlist.title}</div>
+            <div style="font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHtml(m.video.title)}</div>
+            <div style="font-size: 11px; color: var(--ls-secondary-text-color, #888);">${escapeHtml(m.playlist.title)}</div>
           </div>
         </div>
       `

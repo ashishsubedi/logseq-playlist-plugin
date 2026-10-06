@@ -114,6 +114,22 @@ describe("convertVideoToRenderer", () => {
       "{{renderer :yt-playlist, https://www.youtube.com/playlist?list=PLabc}}";
     expect(convertVideoToRenderer(input)).toBeNull();
   });
+
+  it("converts every playlist {{video}} macro in one block", () => {
+    const input =
+      "{{video https://www.youtube.com/playlist?list=PLone}} and {{video https://www.youtube.com/watch?v=vid&list=PLtwo}}";
+    expect(convertVideoToRenderer(input)).toBe(
+      "{{renderer :yt-playlist, https://www.youtube.com/playlist?list=PLone}} and {{renderer :yt-playlist, https://www.youtube.com/watch?v=vid&list=PLtwo}}"
+    );
+  });
+
+  it("leaves single-video macros alone while converting playlist ones", () => {
+    const input =
+      "{{video https://www.youtube.com/watch?v=solo}} plus {{video https://www.youtube.com/playlist?list=PLkeep}}";
+    expect(convertVideoToRenderer(input)).toBe(
+      "{{video https://www.youtube.com/watch?v=solo}} plus {{renderer :yt-playlist, https://www.youtube.com/playlist?list=PLkeep}}"
+    );
+  });
 });
 
 describe("findConvertibleBlocks", () => {

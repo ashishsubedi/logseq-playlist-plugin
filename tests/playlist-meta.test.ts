@@ -68,6 +68,18 @@ describe("noteBlockContent", () => {
       "### Intro\n{{video https://youtu.be/x}}\n"
     );
   });
+
+  it("collapses newlines in titles so markdown stays on one line", () => {
+    expect(noteBlockContent("Line1\nLine2\r\nLine3", "https://youtu.be/x")).toBe(
+      "### Line1 Line2 Line3\n{{video https://youtu.be/x}}\n"
+    );
+  });
+
+  it("falls back to Video for a blank title", () => {
+    expect(noteBlockContent("   \n ", "https://youtu.be/x")).toBe(
+      "### Video\n{{video https://youtu.be/x}}\n"
+    );
+  });
 });
 
 describe("templates", () => {

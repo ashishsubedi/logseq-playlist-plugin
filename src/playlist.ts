@@ -20,12 +20,25 @@ const CACHE_PREFIX = "yt-playlist:";
 const OEMBED_TIMEOUT_MS = 8000;
 
 
+const YOUTUBE_HOSTS = new Set([
+  "youtube.com",
+  "www.youtube.com",
+  "m.youtube.com",
+  "music.youtube.com",
+  "youtu.be",
+  "www.youtu.be",
+  "youtube-nocookie.com",
+  "www.youtube-nocookie.com",
+]);
+
+function isYouTubeHost(hostname: string): boolean {
+  return YOUTUBE_HOSTS.has(hostname.toLowerCase());
+}
+
 export function parsePlaylistId(rawUrl: string): string | null {
   try {
     const u = new URL(rawUrl.trim().replace(/^"(.*)"$/, "$1"));
-    if (!/^(www\.|music\.)?youtube\.com$/.test(u.hostname) && u.hostname !== "youtu.be") {
-      if (!u.hostname.endsWith("youtube.com")) return null;
-    }
+    if (!isYouTubeHost(u.hostname)) return null;
     const id = u.searchParams.get("list");
     return id && id.length > 0 ? id : null;
   } catch {
@@ -151,7 +164,19 @@ export function escapeHtml(s: string): string {
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+/** Allow only https:// URLs so callers never pass javascript:/data: to openExternalLink. */
+export function isSafeExternalUrl(rawUrl: string): boolean {
+  try {
+    const u = new URL(rawUrl.trim());
+    if (u.protocol !== "https:") return false;
+    return isYouTubeHost(u.hostname);
+  } catch {
+    return false;
+  }
 }
 
 function cacheKey(id: string): string {
@@ -359,7 +384,8 @@ export async function fetchEnrichedPlaylistMeta(
 
 
 export function noteBlockContent(title: string, videoUrl: string): string {
-  return `### ${title}\n{{video ${videoUrl}}}\n`;
+  const clean = title.replace(/[\r\n]+/g, " ").trim() || "Video";
+  return `### ${clean}\n{{video ${videoUrl}}}\n`;
 }
 
 export function cardTemplate(
@@ -499,14 +525,18 @@ export function fallbackTemplate(playlistUrl: string): string {
 
 /**
  * Convert `{{video URL}}` to `{{renderer :yt-playlist, URL}}` when URL has a
- * playlist ID. Returns null if no conversion is needed.
+ * playlist ID. Converts every playlist macro in the block. Returns null
+ * if no conversion is needed.
  */
 export function convertVideoToRenderer(content: string): string | null {
-  const match = content.match(/\{\{video\s+(https?:\/\/[^\s}]+)\}\}/);
-  if (!match) return null;
-  const url = match[1];
-  if (!parsePlaylistId(url)) return null;
-  return content.replace(match[0], `{{renderer :yt-playlist, ${url}}}`);
+  const re = /\{\{video\s+(https?:\/\/[^\s}]+)\}\}/g;
+  let changed = false;
+  const next = content.replace(re, (full, url: string) => {
+    if (!parsePlaylistId(url)) return full;
+    changed = true;
+    return `{{renderer :yt-playlist, ${url}}}`;
+  });
+  return changed ? next : null;
 }
 
 export interface BlockLike {
