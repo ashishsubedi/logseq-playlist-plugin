@@ -65,11 +65,22 @@ function registerRenderer() {
 async function addNote(slotUuid: string, url: string, title: string) {
   const content = noteBlockContent(title || "Playlist note", url);
   try {
-    await logseq.Editor.insertBlockAsChild(slotUuid, content);
-  } catch {
+    await logseq.Editor.insertBlock(slotUuid, content, { sibling: false });
+    return;
+  } catch (err) {
+    console.error("[yt-playlist] insertBlock failed, trying page append", err);
+  }
+  try {
     const page = await logseq.Editor.getCurrentPage();
     const name = (page as { name?: string } | null)?.name;
-    if (name) await logseq.Editor.appendBlockInPage(name, content);
+    if (name) {
+      await logseq.Editor.appendBlockInPage(name, content);
+    } else {
+      await logseq.UI.showMsg("Could not add note: no page found.", "warning");
+    }
+  } catch (err) {
+    console.error("[yt-playlist] addNote failed", err);
+    await logseq.UI.showMsg("Could not add note. See console for details.", "warning");
   }
 }
 
@@ -96,9 +107,14 @@ function registerModel() {
     async addVideoFromSelect(e: { dataset: { slotUuid?: string } }) {
       const { slotUuid } = e.dataset;
       if (!slotUuid) return;
-      const sel = parent.document.getElementById(
-        `ytpl-sel-${slotUuid}`
-      ) as HTMLSelectElement | null;
+      let sel: HTMLSelectElement | null = null;
+      try {
+        sel = parent.document.getElementById(
+          `ytpl-sel-${slotUuid}`
+        ) as HTMLSelectElement | null;
+      } catch (err) {
+        console.error("[yt-playlist] cannot read picker value", err);
+      }
       if (!sel || !sel.value) {
         await logseq.UI.showMsg("Please select a video from the dropdown first.", "warning");
         return;
@@ -126,13 +142,35 @@ function registerModel() {
         await logseq.UI.showMsg("No video list available to import.", "warning");
         return;
       }
-      for (const item of meta.items) {
-        try {
-          const content = noteBlockContent(item.title, item.videoUrl);
-          await logseq.Editor.insertBlockAsChild(slotUuid, content);
-        } catch (err) {
-          console.error("[yt-playlist] importAllVideos skipped one item", err);
+      const batch = meta.items.map((item) => ({
+        content: noteBlockContent(item.title, item.videoUrl),
+      }));
+      try {
+        await logseq.Editor.insertBatchBlock(slotUuid, batch, {
+          sibling: false,
+        });
+      } catch (err) {
+        console.error("[yt-playlist] insertBatchBlock failed, trying one by one", err);
+        let done = 0;
+        for (const b of batch) {
+          try {
+            await logseq.Editor.insertBlock(slotUuid, b.content, {
+              sibling: false,
+            });
+            done += 1;
+          } catch (e) {
+            console.error("[yt-playlist] importAllVideos skipped one item", e);
+          }
         }
+        if (done === 0) {
+          await logseq.UI.showMsg(
+            "Could not import videos. See console for details.",
+            "warning"
+          );
+          return;
+        }
+        await logseq.UI.showMsg(`Imported ${done} of ${batch.length} videos as notes.`);
+        return;
       }
       await logseq.UI.showMsg(`Imported ${meta.items.length} videos as notes.`);
     },

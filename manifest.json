@@ -2,7 +2,7 @@
   "id": "logseq-yt-playlist-card",
   "name": "logseq-yt-playlist-card",
   "title": "YouTube Playlist Card",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Compact YouTube playlist cards with note-block actions",
   "main": "dist/index.html",
   "icon": "icon.svg"
