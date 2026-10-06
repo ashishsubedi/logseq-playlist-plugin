@@ -4,6 +4,8 @@
   "title": "YouTube Playlist Card",
   "version": "1.0.1",
   "description": "Compact YouTube playlist cards with note-block actions",
+  "author": "asubedi",
+  "repo": "ashishsubedi/logseq-playlist-plugin",
   "main": "dist/index.html",
   "icon": "icon.svg"
 }
