@@ -206,3 +206,38 @@ Reference mockup: `docs/v2-data-api-mock.html`.
 - Run `npm test` and `npm run build`.
 - Test in Logseq Desktop with test graph.
 - Update `docs/PROGRESS.md`.
+
+---
+
+## 11. Host CSS Regression Guards (Logseq Desktop)
+
+Card HTML renders inline in the Logseq document. Host styles leak in.
+These bugs regressed twice. The rules below are locked by `tests/style.test.ts`.
+Do not remove them without a live Logseq check.
+
+### 11.1 `white-space: pre-wrap` leak (worst offender)
+- Symptom: ~90px voids between title and channel line, and ~100px dead space below the toggle.
+- Cause: Logseq sets `white-space: pre-wrap` on block content. It inherits into the card. Indented template newlines render as line breaks.
+- Guard: `.ytpl-card { white-space: normal; }`. One rule covers all children.
+
+### 11.2 Flex stretch from host wrappers
+- Symptom: card absorbs excess slot height, large empty box below content.
+- Guards: `.ytpl-card { height: fit-content; max-height: fit-content; align-self: flex-start; }`.
+- Guards: `logseq.provideUI` passes `style: { height: "fit-content", minHeight: "0" }`.
+- Guard: `.ytpl-details { height: auto; max-height: fit-content; }`.
+
+### 11.3 Content spread inside the card
+- Symptom: title, picker, and buttons spread across a tall card.
+- Cause: `justify-content: space-between` distributes free space.
+- Guard: `.ytpl-info { justify-content: flex-start; gap: 8px; }`.
+- Guard: no `margin-top: auto` inside the card. Buttons stay packed under the picker.
+
+### 11.4 Margin and image overrides
+- Guard: `.ytpl-card div, .ytpl-card summary { margin: 0; }`. Host margins cannot inject gaps.
+- Guard: `.ytpl-card .ytpl-thumb img { max-width: none; object-fit: cover; }`. Thumbnails always fill.
+- Guard: `.ytpl-thumb { align-self: flex-start; }`. Flex stretch cannot warp the thumbnail.
+
+### 11.5 Primary button accent (user preference)
+- `.ytpl-btn-primary` keeps the red accent (`rgba(255, 0, 51, ...)`).
+- A past polish pass neutralized it. The user asked to bring it back.
+- Locked by test: "restores red accent on the primary Open in YouTube button".

@@ -4,9 +4,10 @@
 
 - Date: 2026-10-06.
 - Phase: V2 complete and verified with tests, build, and screenshots.
-- Tests: 60 pass (`npm test`). Build passes (`npm run build`).
-- Polish pass: default V1 card (no API key) renders clean in narrow Logseq slots.
-- Spread fix: info content clusters at top even in tall slots.
+- Tests: 67 pass (`npm test`). Build passes (`npm run build`).
+- Live Logseq check: card renders compact in `test_graph` on page `Yt Playlist Test`.
+- Polish pass: eliminate bottom dead space, compact paddings, neutral buttons, and refined dropdown.
+- Harmonize default card: friendly Settings prompt banner and consistent track row design.
 - User approved V2 UI design from `docs/v2-data-api-mock.html`.
 - Implementation plan updated in `docs/IMPLEMENTATION_PLAN.md`.
 
@@ -33,8 +34,9 @@
 - [x] Step 14: Implement Logseq model actions (`addVideoFromSelect`, `importAllVideos`, `addVideoRowNote`).
 - [x] Step 15: Implement slash command `/Insert playlist video` search modal.
 - [x] Step 16: Run all unit tests and production build.
-- [x] Step 17: Test manually in Logseq Desktop.
 - [x] Step 18: Add clear API key creation instructions with restrictions guidance in settings schema and README.
+- [x] Step 19: Polish card visuals, eliminate bottom dead space, neutralize button styles, and refine dropdown.
+- [x] Step 20: Harmonize default card with friendly Settings prompt and consistent track row styling.
 
 ---
 
@@ -122,6 +124,8 @@ Each check uses real code output. Card shots render `cardTemplate` from `src/pla
 - `docs/verify-v2/05-v1-default-narrow.png` shows V1 default card source page.
 - `docs/verify-v2/06-v1-default-wide.png` shows V1 default card at wide width.
 - `docs/verify-v2/07-narrow-stacked.png` shows V1 default card stacked in a 400px slot.
+- `docs/verify-v2/10-live-logseq-v2.png` shows live V2 card before the pre-wrap fix.
+- `docs/verify-v2/11-live-fixed.png` shows live V2 card after the pre-wrap fix.
 
 ---
 
@@ -171,6 +175,37 @@ Goal: default card (no API key) looks clean in Logseq. Not only V2 with key.
 - Updated `README.md` with matching steps.
 - Unit tests in `tests/youtube-api.test.ts` verify instruction contents and sentence length limit (60 tests pass).
 
+### P6. Visual Polish & Dead Space Fix (2026-10-06)
+- Check `.ytpl-card` has `height: fit-content` and `align-self: flex-start`. Host flex stretch cannot create dead space.
+- Check `.ytpl-details` has `height: auto` and `max-height: fit-content`. Closed details stays compact.
+- Check `logseq.provideUI` passes `height: fit-content` and `minHeight: 0` inline style.
+- Check `.ytpl-actions` has `margin-top: 2px` instead of `margin-top: auto`. Buttons stay close to picker.
+- Check `.ytpl-info` has compact padding `10px 14px` and gap `6px`. Right side matches thumbnail height.
+- Check `.ytpl-btn-primary` uses neutral button background. It removes clashing red tint across custom themes.
+- Check `.ytpl-select` has inset background `rgba(0, 0, 0, 0.2)` with theme border.
+- Unit tests in `tests/style.test.ts` lock all rules. 64 tests pass. Build passes.
+- Verification shots `docs/verify-v2/01-collapsed-card.png` and `02-expanded-tracklist.png` updated.
+
+### P7. Default Card Consistency & Settings Prompt (2026-10-06)
+- Check note text replaced. Changed "V1 shows one entry" to "Add a YouTube API key in Settings to show all videos."
+- Check `.ytpl-note` banner includes an inline `⚙ Settings` action button.
+- Check `.ytpl-note` styling uses `var(--ls-link-text-color)` left border instead of red `#e05656`.
+- Check `.ytpl-track` row uses 64px thumbnail and row padding matching `.ytpl-track-row`.
+- Check `.ytpl-track` includes an `↗` action button to open the playlist in YouTube.
+- Unit tests in `tests/card-v2.test.ts` and `tests/style.test.ts` pass (66 tests pass).
+- Verification shot `docs/verify-v2/09-default-expanded.png` generated.
+
+### P8. Host pre-wrap fix, red accent restore, live Logseq check (2026-10-06)
+- Symptom: live card showed ~90px voids between title and channel line, and ~100px dead space below the toggle.
+- Root cause: Logseq sets `white-space: pre-wrap` on block content. It inherits into the card. Template newlines render as line breaks.
+- Fix: `.ytpl-card` sets `white-space: normal`. One rule covers all children.
+- Restore: `.ytpl-btn-primary` uses red accent again (`rgba(255, 0, 51, ...)`). Old neutralize test updated to lock red in.
+- Live check: used hidden Logseq with `test_graph`, page `Yt Playlist Test`, API key set. Card height went 434px to 194px. Header block went 179px to 35px. Button bg is `rgba(255, 0, 51, 0.12)`.
+- Unit tests pass (67 tests). Build passes.
+- Shot below is the live Logseq render after reload.
+
+![Live Logseq fixed card](verify-v2/11-live-fixed.png)
+
 ---
 
 ## Test Matrix
@@ -186,6 +221,10 @@ Goal: default card (no API key) looks clean in Logseq. Not only V2 with key.
 - [x] API failure or empty key gracefully falls back to oEmbed.
 - [x] Quick video selector generates child note block.
 - [x] Import All generates hierarchical note blocks.
+- [x] Card ignores host `pre-wrap`. Live check: card 434px to 194px.
+- [x] Card uses `fit-content` height. No dead space in Logseq slots.
+- [x] Info column uses `flex-start`. Content clusters at top.
+- [x] Primary button keeps red accent. Unit test locks it.
 
 ---
 

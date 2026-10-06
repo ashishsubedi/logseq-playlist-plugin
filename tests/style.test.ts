@@ -42,4 +42,34 @@ describe("V2 card polish inside Logseq slots", () => {
       /\.ytpl-card\s+div[\s\S]*?margin:\s*0/
     );
   });
+
+  it("neutralizes host pre-wrap so template newlines do not render as gaps", () => {
+    expect(css).toMatch(/\.ytpl-card\s*\{[^}]*white-space:\s*normal/);
+  });
+
+  it("prevents vertical stretching on the card container", () => {
+    expect(css).toMatch(/\.ytpl-card\s*\{[^}]*height:\s*fit-content/);
+    expect(css).toMatch(/\.ytpl-card\s*\{[^}]*align-self:\s*flex-start/);
+  });
+
+  it("prevents vertical stretching on details container", () => {
+    expect(css).toMatch(/\.ytpl-details\s*\{[^}]*max-height:\s*fit-content/);
+  });
+
+  it("removes margin-top: auto from actions so buttons cluster neatly below picker", () => {
+    expect(css).not.toMatch(/\.ytpl-actions\s*\{[^}]*margin-top:\s*auto/);
+  });
+
+  it("restores red accent on the primary Open in YouTube button", () => {
+    expect(css).toMatch(/\.ytpl-btn-primary\s*\{[^}]*rgba\(255,\s*0,\s*51/);
+  });
+
+  it("styles note banner with link accent border instead of red", () => {
+    expect(css).toMatch(/\.ytpl-note\s*\{[^}]*var\(--ls-link-text-color/);
+    expect(css).not.toMatch(/\.ytpl-note\s*\{[^}]*#e05656/);
+  });
+
+  it("styles track row thumbnail consistently at 64px width", () => {
+    expect(css).toMatch(/\.ytpl-track-img\s*\{[^}]*width:\s*64px/);
+  });
 });

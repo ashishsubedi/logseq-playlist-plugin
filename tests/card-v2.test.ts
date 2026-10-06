@@ -67,11 +67,12 @@ describe("V2 cardTemplate", () => {
     expect(html).toContain("View All 28 Videos");
   });
 
-  it("falls back to V1 card template when items are not present", () => {
+  it("falls back to default card template when items are not present", () => {
     const html = cardTemplate(metaWithoutItems, "slot-2", false);
     expect(html).not.toContain("ytpl-quick-picker");
     expect(html).not.toContain("Import All");
-    expect(html).toContain("V1 shows one entry");
+    expect(html).toContain("Add a YouTube API key in Settings to show all videos");
+    expect(html).not.toContain("V1 shows one entry");
   });
 
   it("offers a Settings shortcut on the default card so users can add a key", () => {
@@ -79,9 +80,10 @@ describe("V2 cardTemplate", () => {
     expect(html).toContain('data-on-click="openSettings"');
   });
 
-  it("renders Settings button to configure API key", () => {
+  it("renders Settings button in note banner to configure API key", () => {
     const html = cardTemplate(metaWithoutItems, "slot-2", false);
-    expect(html).toContain("data-on-click=\"openSettings\"");
+    expect(html).toContain('class="ytpl-note"');
+    expect(html).toContain('data-on-click="openSettings"');
     expect(html).toContain("Settings");
   });
 

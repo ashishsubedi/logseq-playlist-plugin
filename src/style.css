@@ -8,12 +8,17 @@
 }
 .ytpl-card {
   max-width: 680px;
+  width: 100%;
+  height: fit-content;
+  max-height: fit-content;
+  align-self: flex-start;
   background: var(--ls-secondary-background-color, #262626);
   border: 1px solid var(--ls-border-color, #3a3a3a);
   border-radius: 10px;
   overflow: hidden;
   font-family: inherit;
   line-height: 1.5;
+  white-space: normal;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
   margin: 6px 0;
@@ -96,18 +101,18 @@
   opacity: 0.8;
 }
 .ytpl-info {
-  padding: 12px 16px;
+  padding: 10px 14px;
   flex: 1;
   min-width: 0;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  gap: 8px;
+  gap: 6px;
 }
 .ytpl-title {
   color: var(--ls-primary-text-color, #fff);
-  font-size: 14.5px;
-  line-height: 1.35;
+  font-size: 14px;
+  line-height: 1.3;
   font-weight: 600;
   margin: 0;
   display: -webkit-box;
@@ -116,15 +121,15 @@
   overflow: hidden;
 }
 .ytpl-meta {
-  font-size: 12px;
-  margin: 2px 0 0;
+  font-size: 11.5px;
+  margin: 0;
   color: var(--ls-secondary-text-color, #999);
 }
 .ytpl-actions {
   display: flex;
-  gap: 8px;
-  margin-top: auto;
-  padding-top: 8px;
+  gap: 6px;
+  margin-top: 2px;
+  padding-top: 4px;
   flex-wrap: wrap;
 }
 .ytpl-btn {
@@ -176,16 +181,16 @@
 .ytpl-quick-picker {
   display: flex;
   gap: 6px;
-  margin-top: 4px;
-  background: rgba(0, 0, 0, 0.2);
-  padding: 6px;
+  margin-top: 2px;
+  background: rgba(0, 0, 0, 0.25);
+  padding: 4px 6px;
   border-radius: 6px;
   border: 1px solid var(--ls-border-color, #3d3d3d);
 }
 .ytpl-select {
   flex: 1;
   min-width: 0;
-  background: var(--ls-tertiary-background-color, #333);
+  background: rgba(0, 0, 0, 0.2);
   color: var(--ls-primary-text-color, #eee);
   border: 1px solid var(--ls-border-color, #444);
   border-radius: 5px;
@@ -206,6 +211,8 @@
   border-top: 1px solid var(--ls-border-color, #333);
   padding: 8px 14px 10px;
   background: rgba(0, 0, 0, 0.12);
+  height: auto;
+  max-height: fit-content;
 }
 .ytpl-summary {
   font-size: 12px;
@@ -237,8 +244,8 @@
 }
 .ytpl-track {
   display: flex;
-  gap: 12px;
-  padding: 10px 12px;
+  gap: 10px;
+  padding: 8px 10px;
   margin-top: 8px;
   border-radius: 6px;
   background: var(--ls-secondary-background-color, #222);
@@ -246,7 +253,7 @@
   align-items: center;
 }
 .ytpl-track-img {
-  width: 90px;
+  width: 64px;
   aspect-ratio: 16/9;
   border-radius: 4px;
   object-fit: cover;
@@ -291,13 +298,17 @@
   border-color: var(--ls-link-text-color, #8ec9c5);
 }
 .ytpl-note {
-  font-size: 11.5px;
-  color: var(--ls-secondary-text-color, #999);
+  font-size: 12px;
+  color: var(--ls-secondary-text-color, #aaa);
   margin-top: 8px;
-  padding: 6px 12px;
-  border-left: 3px solid #e05656;
-  background: rgba(224, 86, 86, 0.06);
-  border-radius: 0 4px 4px 0;
+  padding: 8px 12px;
+  border-left: 3px solid var(--ls-link-text-color, #8ec9c5);
+  background: rgba(142, 201, 197, 0.08);
+  border-radius: 0 6px 6px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
 }
 .ytpl-tracklist {
   display: flex;

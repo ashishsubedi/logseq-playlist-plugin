@@ -32,7 +32,16 @@ async function renderCard(slot: string, blockUuid: string, url: string) {
   const template = meta
     ? cardTemplate(meta, blockUuid, false)
     : fallbackTemplate(url);
-  logseq.provideUI({ key, slot, reset: true, template });
+  logseq.provideUI({
+    key,
+    slot,
+    reset: true,
+    template,
+    style: {
+      height: "fit-content",
+      minHeight: "0",
+    },
+  });
 }
 
 function registerRenderer() {

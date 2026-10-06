@@ -12,6 +12,10 @@ h2{font-size:12px;color:#8ec9c5;text-transform:uppercase;letter-spacing:.08em;ma
 }
 .ytpl-card {
   max-width: 680px;
+  width: 100%;
+  height: fit-content;
+  max-height: fit-content;
+  align-self: flex-start;
   background: var(--ls-secondary-background-color, #262626);
   border: 1px solid var(--ls-border-color, #3a3a3a);
   border-radius: 10px;
@@ -100,18 +104,18 @@ h2{font-size:12px;color:#8ec9c5;text-transform:uppercase;letter-spacing:.08em;ma
   opacity: 0.8;
 }
 .ytpl-info {
-  padding: 12px 16px;
+  padding: 10px 14px;
   flex: 1;
   min-width: 0;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  gap: 8px;
+  gap: 6px;
 }
 .ytpl-title {
   color: var(--ls-primary-text-color, #fff);
-  font-size: 14.5px;
-  line-height: 1.35;
+  font-size: 14px;
+  line-height: 1.3;
   font-weight: 600;
   margin: 0;
   display: -webkit-box;
@@ -120,15 +124,15 @@ h2{font-size:12px;color:#8ec9c5;text-transform:uppercase;letter-spacing:.08em;ma
   overflow: hidden;
 }
 .ytpl-meta {
-  font-size: 12px;
-  margin: 2px 0 0;
+  font-size: 11.5px;
+  margin: 0;
   color: var(--ls-secondary-text-color, #999);
 }
 .ytpl-actions {
   display: flex;
-  gap: 8px;
-  margin-top: auto;
-  padding-top: 8px;
+  gap: 6px;
+  margin-top: 2px;
+  padding-top: 4px;
   flex-wrap: wrap;
 }
 .ytpl-btn {
@@ -159,13 +163,13 @@ h2{font-size:12px;color:#8ec9c5;text-transform:uppercase;letter-spacing:.08em;ma
   outline-offset: 2px;
 }
 .ytpl-btn-primary {
-  background: rgba(255, 0, 51, 0.12);
-  border-color: rgba(255, 0, 51, 0.35);
+  background: var(--ls-tertiary-background-color, #333);
+  border-color: var(--ls-border-color, #4a4a4a);
   color: var(--ls-primary-text-color, #eee);
 }
 .ytpl-btn-primary:hover {
-  background: rgba(255, 0, 51, 0.22);
-  border-color: #ff0033;
+  filter: brightness(1.15);
+  border-color: var(--ls-link-text-color, #8ec9c5);
 }
 .ytpl-btn-action {
   background: rgba(142, 201, 197, 0.12);
@@ -180,16 +184,16 @@ h2{font-size:12px;color:#8ec9c5;text-transform:uppercase;letter-spacing:.08em;ma
 .ytpl-quick-picker {
   display: flex;
   gap: 6px;
-  margin-top: 4px;
-  background: rgba(0, 0, 0, 0.2);
-  padding: 6px;
+  margin-top: 2px;
+  background: rgba(0, 0, 0, 0.25);
+  padding: 4px 6px;
   border-radius: 6px;
   border: 1px solid var(--ls-border-color, #3d3d3d);
 }
 .ytpl-select {
   flex: 1;
   min-width: 0;
-  background: var(--ls-tertiary-background-color, #333);
+  background: rgba(0, 0, 0, 0.2);
   color: var(--ls-primary-text-color, #eee);
   border: 1px solid var(--ls-border-color, #444);
   border-radius: 5px;
@@ -210,6 +214,8 @@ h2{font-size:12px;color:#8ec9c5;text-transform:uppercase;letter-spacing:.08em;ma
   border-top: 1px solid var(--ls-border-color, #333);
   padding: 8px 14px 10px;
   background: rgba(0, 0, 0, 0.12);
+  height: auto;
+  max-height: fit-content;
 }
 .ytpl-summary {
   font-size: 12px;
@@ -426,6 +432,7 @@ h2{font-size:12px;color:#8ec9c5;text-transform:uppercase;letter-spacing:.08em;ma
     flex-wrap: wrap;
   }
 }
+
 
 </style></head><body><h2>V2 collapsed card — count badge + quick picker + Import All</h2><div class="ytpl-card">
     <div class="ytpl-main">

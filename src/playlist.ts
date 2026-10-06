@@ -451,8 +451,14 @@ export function cardTemplate(
         ${thumb ? `<img class="ytpl-track-img" src="${thumb}" alt="Playlist thumbnail" />` : ""}
         <div class="ytpl-track-info"><div class="ytpl-track-title">${t}</div>
         <div class="ytpl-track-meta">Playlist • Open in YouTube for full list</div></div>
+        <div class="ytpl-track-actions">
+          <button class="ytpl-btn" data-on-click="openYouTube" data-url="${src}">↗</button>
+        </div>
       </div>
-      <div class="ytpl-note">V1 shows one entry. Full list needs API key (V2).</div>
+      <div class="ytpl-note">
+        <span>Add a YouTube API key in Settings to show all videos.</span>
+        <button class="ytpl-btn ytpl-btn-action" data-on-click="openSettings">⚙ Settings</button>
+      </div>
     </details>`;
   }
 
