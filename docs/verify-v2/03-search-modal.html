@@ -1,11 +1,7 @@
-.ytpl-card,
-.ytpl-card * {
-  box-sizing: border-box;
-}
-.ytpl-card div,
-.ytpl-card summary {
-  margin: 0;
-}
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>v2 modal</title><style>
+:root{--ls-primary-background-color:#1e1e1e;--ls-secondary-background-color:#262626;--ls-tertiary-background-color:#333;--ls-border-color:#3d3d3d;--ls-primary-text-color:#eee;--ls-secondary-text-color:#aaa;--ls-link-text-color:#8ec9c5;}
+body{background:#1e1e1e;color:#eee;font-family:-apple-system,Inter,sans-serif;padding:32px;max-width:760px;margin:0 auto;}
+h2{font-size:13px;color:#8ec9c5;text-transform:uppercase;letter-spacing:.08em;}
 .ytpl-card {
   max-width: 680px;
   background: var(--ls-secondary-background-color, #262626);
@@ -13,36 +9,30 @@
   border-radius: 10px;
   overflow: hidden;
   font-family: inherit;
-  line-height: 1.5;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
   margin: 6px 0;
-  text-align: left;
 }
 .ytpl-card:hover {
   border-color: var(--ls-border-color-hover, #4a4a4a);
 }
 .ytpl-main {
   display: flex;
-  align-items: flex-start;
 }
 .ytpl-thumb {
   position: relative;
   width: 220px;
   min-width: 200px;
   aspect-ratio: 16/9;
-  align-self: flex-start;
   background: #000;
   overflow: hidden;
   flex-shrink: 0;
 }
-.ytpl-card .ytpl-thumb img {
+.ytpl-thumb img {
   width: 100%;
   height: 100%;
-  max-width: none;
   object-fit: cover;
   display: block;
-  margin: 0;
 }
 .ytpl-badge {
   position: absolute;
@@ -98,18 +88,17 @@
 .ytpl-info {
   padding: 12px 16px;
   flex: 1;
-  min-width: 0;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
-  gap: 8px;
+  justify-content: space-between;
+  gap: 6px;
+  min-width: 0;
 }
 .ytpl-title {
   color: var(--ls-primary-text-color, #fff);
   font-size: 14.5px;
   line-height: 1.35;
   font-weight: 600;
-  margin: 0;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -117,7 +106,6 @@
 }
 .ytpl-meta {
   font-size: 12px;
-  margin: 2px 0 0;
   color: var(--ls-secondary-text-color, #999);
 }
 .ytpl-actions {
@@ -130,12 +118,9 @@
 .ytpl-btn {
   font-size: 12px;
   font-weight: 500;
-  font-family: inherit;
-  line-height: 1.5;
   padding: 5px 12px;
   border-radius: 6px;
   min-height: 32px;
-  margin: 0;
   border: 1px solid var(--ls-border-color, #4a4a4a);
   background: var(--ls-tertiary-background-color, #333);
   color: var(--ls-primary-text-color, #eee);
@@ -184,18 +169,15 @@
 }
 .ytpl-select {
   flex: 1;
-  min-width: 0;
   background: var(--ls-tertiary-background-color, #333);
   color: var(--ls-primary-text-color, #eee);
   border: 1px solid var(--ls-border-color, #444);
   border-radius: 5px;
   padding: 5px 8px;
   font-size: 12px;
-  font-family: inherit;
-  line-height: 1.5;
   outline: none;
   cursor: pointer;
-  margin: 0;
+  min-width: 0;
 }
 
 .ytpl-icon {
@@ -210,9 +192,7 @@
 .ytpl-summary {
   font-size: 12px;
   font-weight: 500;
-  font-family: inherit;
   padding: 4px 10px;
-  margin: 0;
   border-radius: 6px;
   border: 1px solid var(--ls-border-color, #444);
   background: var(--ls-tertiary-background-color, #2a2a2a);
@@ -257,11 +237,8 @@
   min-width: 0;
 }
 .ytpl-track-title {
-  flex: 1;
-  min-width: 0;
   font-size: 12.5px;
   font-weight: 500;
-  margin: 0;
   color: var(--ls-primary-text-color, #eee);
   white-space: nowrap;
   overflow: hidden;
@@ -327,14 +304,11 @@
   width: 22px;
   text-align: center;
 }
-.ytpl-card .ytpl-track-row img.ytpl-track-thumb {
+.ytpl-track-thumb {
   width: 64px;
-  height: auto;
   aspect-ratio: 16/9;
   border-radius: 4px;
   object-fit: cover;
-  flex-shrink: 0;
-  margin: 0;
 }
 .ytpl-track-actions {
   display: flex;
@@ -408,18 +382,4 @@
   padding: 14px 18px;
 }
 
-/* Narrow Logseq slots: stack thumbnail above info so the
-   default V1 card stays clean without an API key. */
-@media (max-width: 520px) {
-  .ytpl-main {
-    flex-direction: column;
-  }
-  .ytpl-thumb {
-    width: 100%;
-    min-width: 0;
-  }
-  .ytpl-track-row {
-    flex-wrap: wrap;
-  }
-}
-
+</style></head><body><h2>V2 slash command — /Insert playlist video search modal</h2><div style="padding:24px 0 40px;"><div class="ytpl-modal"><div class="ytpl-modal-header"><span>🔍</span><input class="ytpl-search-input" value="simd" /></div><div class="ytpl-search-results"><div class="ytpl-search-item selected"><span style="color:#ff0033;">▶</span><div style="flex:1;"><div style="font-weight:600;">3. ISPC &amp; SIMD Execution</div><div style="font-size:11px;color:#888;">Stanford CS149 Parallel Computing</div></div></div><div class="ytpl-search-item"><span>▶</span><div style="flex:1;"><div>7. GPU Architecture</div><div style="font-size:11px;color:#888;">Stanford CS149</div></div></div></div></div></div></body></html>

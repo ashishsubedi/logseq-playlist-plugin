@@ -1,10 +1,10 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>v1 narrow</title><style>
+:root{--ls-primary-background-color:#1e1e1e;--ls-secondary-background-color:#262626;--ls-tertiary-background-color:#333;--ls-border-color:#3d3d3d;--ls-primary-text-color:#eee;--ls-secondary-text-color:#aaa;--ls-link-text-color:#8ec9c5;}
+body{background:#1e1e1e;color:#eee;font-family:-apple-system,Inter,sans-serif;padding:16px;margin:0;}
+h2{font-size:12px;color:#8ec9c5;text-transform:uppercase;letter-spacing:.08em;margin:0 0 8px;}
 .ytpl-card,
 .ytpl-card * {
   box-sizing: border-box;
-}
-.ytpl-card div,
-.ytpl-card summary {
-  margin: 0;
 }
 .ytpl-card {
   max-width: 680px;
@@ -98,11 +98,11 @@
 .ytpl-info {
   padding: 12px 16px;
   flex: 1;
-  min-width: 0;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
-  gap: 8px;
+  justify-content: space-between;
+  gap: 6px;
+  min-width: 0;
 }
 .ytpl-title {
   color: var(--ls-primary-text-color, #fff);
@@ -423,3 +423,31 @@
   }
 }
 
+</style></head><body><h2>V1 default (no API key) — narrow Logseq slot</h2><div class="ytpl-card">
+    <div class="ytpl-main">
+    <div class="ytpl-thumb"><img src="https://i.ytimg.com/vi/V1tINV2-9p4/hqdefault.jpg" alt="Playlist thumbnail for Stanford CS149 Parallel Computing" />
+      <div class="ytpl-badge"><span class="ytpl-badge-icon">▶</span> PLAYLIST</div>
+      <div class="ytpl-count"><span class="ytpl-count-icon">☰</span><span class="ytpl-count-label">PLAYLIST</span></div>
+    </div>
+    <div class="ytpl-info">
+      <div>
+        <div class="ytpl-title">Stanford CS149 Parallel Computing</div>
+        <div class="ytpl-meta">kein406 • YouTube Playlist</div>
+      </div>
+      
+      <div class="ytpl-actions">
+        <button class="ytpl-btn ytpl-btn-primary" data-on-click="openYouTube" data-url="https://www.youtube.com/playlist?list=PLosJChMwPtizq2swoD8DZXc567PJ9YKnn"><span class="ytpl-icon">↗</span> Open in YouTube</button>
+        
+        <button class="ytpl-btn" data-on-click="openSettings"><span class="ytpl-icon">⚙</span> Settings</button>
+      </div>
+    </div>
+    </div><details class="ytpl-details">
+      <summary class="ytpl-summary"><span class="ytpl-chevron">▾</span> Expand</summary>
+      <div class="ytpl-track">
+        <img class="ytpl-track-img" src="https://i.ytimg.com/vi/V1tINV2-9p4/hqdefault.jpg" alt="Playlist thumbnail" />
+        <div class="ytpl-track-info"><div class="ytpl-track-title">Stanford CS149 Parallel Computing</div>
+        <div class="ytpl-track-meta">Playlist • Open in YouTube for full list</div></div>
+      </div>
+      <div class="ytpl-note">V1 shows one entry. Full list needs API key (V2).</div>
+    </details>
+  </div></body></html>

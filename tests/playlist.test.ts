@@ -2,8 +2,11 @@ import { describe, expect, it } from "vitest";
 import {
   buildEmbedUrl,
   buildOEmbedUrl,
+  clearCacheForTests,
   escapeHtml,
   parsePlaylistId,
+  searchCachedVideos,
+  writeCache,
 } from "../src/playlist";
 
 describe("parsePlaylistId", () => {
@@ -69,3 +72,44 @@ describe("escapeHtml", () => {
     );
   });
 });
+
+describe("searchCachedVideos", () => {
+  it("finds videos across cached playlists matching query", () => {
+    clearCacheForTests();
+    writeCache({
+      id: "PLsimd",
+      title: "Stanford CS149",
+      author: "Stanford",
+      thumbnailUrl: "",
+      sourceUrl: "https://www.youtube.com/playlist?list=PLsimd",
+      videoCount: 2,
+      items: [
+        {
+          id: "v1",
+          title: "ISPC & SIMD Execution",
+          position: 0,
+          thumbnailUrl: "",
+          videoUrl: "https://www.youtube.com/watch?v=v1",
+        },
+        {
+          id: "v2",
+          title: "GPU Architecture",
+          position: 1,
+          thumbnailUrl: "",
+          videoUrl: "https://www.youtube.com/watch?v=v2",
+        },
+      ],
+    });
+
+    const matches = searchCachedVideos("simd");
+    expect(matches).toHaveLength(1);
+    expect(matches[0].video.title).toBe("ISPC & SIMD Execution");
+  });
+
+  it("returns empty array when query is empty or no match", () => {
+    expect(searchCachedVideos("")).toEqual([]);
+    expect(searchCachedVideos("nonexistent")).toEqual([]);
+  });
+});
+
+

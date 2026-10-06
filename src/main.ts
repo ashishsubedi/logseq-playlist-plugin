@@ -3,13 +3,21 @@ import css from "./style.css?raw";
 import {
   cardTemplate,
   fallbackTemplate,
-  fetchPlaylistMeta,
+  fetchEnrichedPlaylistMeta,
   findConvertibleBlocks,
   noteBlockContent,
   parsePlaylistId,
+  readCache,
+  searchCachedVideos,
   selectPlaylistUrl,
   type BlockLike,
+  API_KEY_SETTING_DESCRIPTION,
 } from "./playlist";
+
+function getApiKey(): string {
+  const settings = logseq.settings as { youtubeApiKey?: string } | undefined;
+  return (settings?.youtubeApiKey ?? "").trim();
+}
 
 function rendererArgs(payload: { arguments?: string[] }): string[] {
   return payload.arguments ?? [];
@@ -18,7 +26,8 @@ function rendererArgs(payload: { arguments?: string[] }): string[] {
 async function renderCard(slot: string, blockUuid: string, url: string) {
   const id = parsePlaylistId(url);
   if (!id) return;
-  const meta = await fetchPlaylistMeta(url);
+  const apiKey = getApiKey();
+  const meta = await fetchEnrichedPlaylistMeta(url, apiKey);
   const key = `ytpl-${id}-${slot}`;
   const template = meta
     ? cardTemplate(meta, blockUuid, false)
@@ -60,24 +69,139 @@ function registerModel() {
         window.open(url, "_blank");
       }
     },
-    async addNoteBlock(e: {
-      dataset: { slotUuid?: string; url?: string; title?: string };
-    }) {
-      const { slotUuid, url, title } = e.dataset;
-      if (!slotUuid || !url) return;
-      await addNote(slotUuid, url, title ?? "Playlist note");
+    openSettings() {
+      try {
+        logseq.showSettingsUI();
+      } catch {
+        void logseq.UI.showMsg(
+          "Open Plugins → logseq-playlist-plugin → Settings to add your API key."
+        );
+      }
     },
-    async importAll(e: {
+    async addVideoFromSelect(e: { dataset: { slotUuid?: string } }) {
+      const { slotUuid } = e.dataset;
+      if (!slotUuid) return;
+      const sel = parent.document.getElementById(
+        `ytpl-sel-${slotUuid}`
+      ) as HTMLSelectElement | null;
+      if (!sel || !sel.value) {
+        await logseq.UI.showMsg("Please select a video from the dropdown first.", "warning");
+        return;
+      }
+      const opt = sel.selectedOptions[0];
+      const url = opt.getAttribute("data-url");
+      const title = opt.getAttribute("data-title");
+      if (!url) return;
+      await addNote(slotUuid, url, title ?? "Video");
+    },
+    async addVideoRowNote(e: {
       dataset: { slotUuid?: string; url?: string; title?: string };
     }) {
       const { slotUuid, url, title } = e.dataset;
       if (!slotUuid || !url) return;
-      await addNote(slotUuid, url, title ?? "Playlist");
+      await addNote(slotUuid, url, title ?? "Video");
+    },
+    async importAllVideos(e: {
+      dataset: { slotUuid?: string; playlistId?: string };
+    }) {
+      const { slotUuid, playlistId } = e.dataset;
+      if (!slotUuid || !playlistId) return;
+      const meta = readCache(playlistId);
+      if (!meta || !meta.items || meta.items.length === 0) {
+        await logseq.UI.showMsg("No video list available to import.", "warning");
+        return;
+      }
+      for (const item of meta.items) {
+        const content = noteBlockContent(item.title, item.videoUrl);
+        await logseq.Editor.insertBlockAsChild(slotUuid, content);
+      }
+      await logseq.UI.showMsg(`Imported ${meta.items.length} videos as notes.`);
+    },
+    async insertSearchResult(e: {
+      dataset: { url?: string; title?: string };
+    }) {
+      const { url, title } = e.dataset;
+      if (!url) return;
+      const content = noteBlockContent(title ?? "Video", url);
+      await logseq.Editor.insertAtEditingCursor(content);
+      logseq.provideUI({ key: "ytpl-search-modal", template: "" });
+    },
+    async closeSearchModal() {
+      logseq.provideUI({ key: "ytpl-search-modal", template: "" });
     },
   });
 }
 
+function openSearchModal() {
+  const modalTemplate = `
+    <div class="ytpl-modal-overlay" data-on-click="closeSearchModal">
+      <div class="ytpl-modal" onclick="event.stopPropagation()">
+        <div class="ytpl-modal-header">
+          <span style="font-size: 14px;">🔍</span>
+          <input class="ytpl-search-input" id="ytpl-search-input" type="text" placeholder="Search playlist video by title..." autofocus />
+        </div>
+        <div class="ytpl-search-results" id="ytpl-search-results">
+          <div style="font-size: 12px; color: var(--ls-secondary-text-color, #888); padding: 8px;">Type to search cached playlist videos...</div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  logseq.provideUI({
+    key: "ytpl-search-modal",
+    close: "outside",
+    template: modalTemplate,
+  });
+
+  setTimeout(() => {
+    const doc = parent.document;
+    const input = doc.getElementById("ytpl-search-input") as HTMLInputElement | null;
+    const resultsContainer = doc.getElementById("ytpl-search-results");
+    if (!input || !resultsContainer) return;
+    input.focus();
+
+    input.addEventListener("input", () => {
+      const val = input.value.trim();
+      const matches = searchCachedVideos(val);
+      if (matches.length === 0) {
+        resultsContainer.innerHTML = `<div style="font-size: 12px; color: var(--ls-secondary-text-color, #888); padding: 8px;">No videos found.</div>`;
+        return;
+      }
+      resultsContainer.innerHTML = matches
+        .map(
+          (m) => `
+        <div class="ytpl-search-item" data-on-click="insertSearchResult" data-url="${m.video.videoUrl}" data-title="${m.video.title.replace(/"/g, "&quot;")}">
+          <span style="color: #ff0033;">▶</span>
+          <div style="flex: 1; min-width: 0;">
+            <div style="font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${m.video.title}</div>
+            <div style="font-size: 11px; color: var(--ls-secondary-text-color, #888);">${m.playlist.title}</div>
+          </div>
+        </div>
+      `
+        )
+        .join("");
+    });
+  }, 100);
+}
+
 function main() {
+  logseq.useSettingsSchema([
+    {
+      key: "youtubeApiKey",
+      type: "string",
+      default: "",
+      title: "YouTube Data API v3 Key (Optional)",
+      description: API_KEY_SETTING_DESCRIPTION,
+    },
+  ]);
+
+  logseq.onSettingsChanged(() => {
+    void logseq.UI.showMsg(
+      "Playlist settings saved. Reopen the page to refresh cards.",
+      "success"
+    );
+  });
+
   logseq.provideStyle(css);
   registerRenderer();
   registerModel();
@@ -87,6 +211,13 @@ function main() {
       "{{renderer :yt-playlist, https://www.youtube.com/playlist?list=}}"
     );
   });
+
+  logseq.Editor.registerSlashCommand(
+    "Insert playlist video",
+    async () => {
+      openSearchModal();
+    }
+  );
 
   logseq.Editor.registerBlockContextMenuItem(
     "Playlist → card",
@@ -105,12 +236,11 @@ function main() {
     }
   );
 
-  // Expand uses native <details> element. No JS toggle is needed.
-
   watchVideoMacros();
 
   console.log("[yt-playlist] loaded");
 }
+
 
 /**
  * Watch for blocks with `{{video URL}}` where URL contains a playlist ID.

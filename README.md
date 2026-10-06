@@ -21,7 +21,26 @@ Paste a YouTube playlist URL. Get a small card. Expand the card. Make note block
 - Run `npm run build`.
 - Load the unpacked folder in Logseq Desktop.
 
+## API Key Setup (Optional)
+
+Basic cards work without an API key.
+An API key enables video counts, the video selector, and bulk import.
+
+To create a free API key:
+1. Open [Google Cloud Console](https://console.cloud.google.com).
+2. Create a new project or select an existing project.
+3. Open **APIs & Services → Library**.
+4. Search for **YouTube Data API v3** and click **Enable**.
+5. Open **APIs & Services → Credentials**.
+6. Click **+ Create Credentials → API key**.
+7. Click **Edit API key** to set restrictions:
+   - Set **Application restrictions** to **None** (required for desktop apps).
+   - Set **API restrictions** to **Restrict key** and select **YouTube Data API v3**.
+8. Click **Save** (Google changes may take up to 5 minutes).
+9. Copy your API key.
+10. Open plugin settings in Logseq, paste the key, and reopen the page.
+
 ## Limits (V1)
 
 - V1 shows no inline player. Use `Open in YouTube`.
-- V1 shows one track entry. Full list needs API key (V2).
+- Basic cards without an API key show one track entry.

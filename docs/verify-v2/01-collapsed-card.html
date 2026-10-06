@@ -1,3 +1,7 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>v2</title><style>
+:root{--ls-primary-background-color:#1e1e1e;--ls-secondary-background-color:#262626;--ls-tertiary-background-color:#333;--ls-border-color:#3d3d3d;--ls-primary-text-color:#eee;--ls-secondary-text-color:#aaa;--ls-link-text-color:#8ec9c5;}
+body{background:#1e1e1e;color:#eee;font-family:-apple-system,Inter,sans-serif;padding:16px;margin:0 auto;max-width:760px;}
+h2{font-size:12px;color:#8ec9c5;text-transform:uppercase;letter-spacing:.08em;margin:0 0 8px;}
 .ytpl-card,
 .ytpl-card * {
   box-sizing: border-box;
@@ -423,3 +427,59 @@
   }
 }
 
+</style></head><body><h2>V2 collapsed card — count badge + quick picker + Import All</h2><div class="ytpl-card">
+    <div class="ytpl-main">
+    <div class="ytpl-thumb"><img src="https://i.ytimg.com/vi/V1tINV2-9p4/hqdefault.jpg" alt="Playlist thumbnail for Stanford CS149 Parallel Computing" />
+      <div class="ytpl-badge"><span class="ytpl-badge-icon">▶</span> PLAYLIST</div>
+      <div class="ytpl-count"><span class="ytpl-count-icon">☰</span><span class="ytpl-count-number">18</span><span class="ytpl-count-label">VIDEOS</span></div>
+    </div>
+    <div class="ytpl-info">
+      <div>
+        <div class="ytpl-title">Stanford CS149 Parallel Computing</div>
+        <div class="ytpl-meta">kein406 • YouTube Playlist</div>
+      </div>
+      <div class="ytpl-quick-picker">
+        <select class="ytpl-select" id="ytpl-sel-s1">
+          <option value="">Select video to reference...</option>
+          <option value="v1" data-url="https://www.youtube.com/watch?v=v1" data-title="1. Course Intro &amp; Parallel Basics">1. Course Intro &amp; Parallel Basics</option><option value="v2" data-url="https://www.youtube.com/watch?v=v2" data-title="2. Work, Span &amp; Parallelism">2. Work, Span &amp; Parallelism</option><option value="v3" data-url="https://www.youtube.com/watch?v=v3" data-title="3. ISPC &amp; SIMD Execution">3. ISPC &amp; SIMD Execution</option>
+        </select>
+        <button class="ytpl-btn ytpl-btn-action" data-on-click="addVideoFromSelect" data-slot-uuid="s1">+ Add Note</button>
+      </div>
+      <div class="ytpl-actions">
+        <button class="ytpl-btn ytpl-btn-primary" data-on-click="openYouTube" data-url="https://www.youtube.com/playlist?list=PLtest"><span class="ytpl-icon">↗</span> Open in YouTube</button>
+        <button class="ytpl-btn" data-on-click="importAllVideos" data-slot-uuid="s1" data-playlist-id="PLtest">↓ Import All (18)</button>
+        
+      </div>
+    </div>
+    </div><details class="ytpl-details">
+      <summary class="ytpl-summary"><span class="ytpl-chevron">▾</span> View All 18 Videos</summary>
+      <div class="ytpl-tracklist">
+        <div class="ytpl-track-row">
+          <span class="ytpl-track-num">#1</span>
+          <img class="ytpl-track-thumb" src="https://i.ytimg.com/vi/v1/mqdefault.jpg" alt="1. Course Intro &amp; Parallel Basics" />
+          <div class="ytpl-track-title">1. Course Intro &amp; Parallel Basics</div>
+          <div class="ytpl-track-actions">
+            <button class="ytpl-btn" data-on-click="openYouTube" data-url="https://www.youtube.com/watch?v=v1">↗</button>
+            <button class="ytpl-btn ytpl-btn-action" data-on-click="addVideoRowNote" data-slot-uuid="s1" data-url="https://www.youtube.com/watch?v=v1" data-title="1. Course Intro &amp; Parallel Basics">+ Note</button>
+          </div>
+        </div>
+        <div class="ytpl-track-row">
+          <span class="ytpl-track-num">#2</span>
+          <img class="ytpl-track-thumb" src="https://i.ytimg.com/vi/v2/mqdefault.jpg" alt="2. Work, Span &amp; Parallelism" />
+          <div class="ytpl-track-title">2. Work, Span &amp; Parallelism</div>
+          <div class="ytpl-track-actions">
+            <button class="ytpl-btn" data-on-click="openYouTube" data-url="https://www.youtube.com/watch?v=v2">↗</button>
+            <button class="ytpl-btn ytpl-btn-action" data-on-click="addVideoRowNote" data-slot-uuid="s1" data-url="https://www.youtube.com/watch?v=v2" data-title="2. Work, Span &amp; Parallelism">+ Note</button>
+          </div>
+        </div>
+        <div class="ytpl-track-row">
+          <span class="ytpl-track-num">#3</span>
+          <img class="ytpl-track-thumb" src="https://i.ytimg.com/vi/v3/mqdefault.jpg" alt="3. ISPC &amp; SIMD Execution" />
+          <div class="ytpl-track-title">3. ISPC &amp; SIMD Execution</div>
+          <div class="ytpl-track-actions">
+            <button class="ytpl-btn" data-on-click="openYouTube" data-url="https://www.youtube.com/watch?v=v3">↗</button>
+            <button class="ytpl-btn ytpl-btn-action" data-on-click="addVideoRowNote" data-slot-uuid="s1" data-url="https://www.youtube.com/watch?v=v3" data-title="3. ISPC &amp; SIMD Execution">+ Note</button>
+          </div>
+        </div></div>
+    </details>
+  </div></body></html>
