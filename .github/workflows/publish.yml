@@ -28,7 +28,7 @@ jobs:
       - name: Zip plugin
         run: >
           zip -r ${{ github.event.repository.name }}.zip
-          dist manifest.json icon.svg package.json README.md LICENSE assets
+          dist manifest.json icon.png icon.svg package.json README.md LICENSE assets
 
       - name: Upload zip to release
         uses: softprops/action-gh-release@v2
