@@ -1,5 +1,6 @@
 {
-  "name": "logseq-playlist-plugin",
+  "id": "logseq-yt-playlist-card",
+  "name": "logseq-yt-playlist-card",
   "title": "YouTube Playlist Card",
   "version": "1.0.0",
   "description": "Compact YouTube playlist cards with note-block actions",

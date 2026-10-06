@@ -161,6 +161,27 @@ describe("searchCachedVideos", () => {
     expect(searchCachedVideos("")).toEqual([]);
     expect(searchCachedVideos("nonexistent")).toEqual([]);
   });
+
+  it("respects search result limit", () => {
+    const items = Array.from({ length: 30 }, (_, i) => ({
+      id: `v${i}`,
+      title: `Lecture ${i}`,
+      position: i,
+      thumbnailUrl: "",
+      videoUrl: `https://www.youtube.com/watch?v=v${i}`,
+    }));
+    writeCache({
+      id: "PLbig",
+      title: "Big Course",
+      author: "Prof",
+      thumbnailUrl: "",
+      sourceUrl: "https://www.youtube.com/playlist?list=PLbig",
+      videoCount: 30,
+      items,
+    });
+    const limited = searchCachedVideos("lecture", 5);
+    expect(limited).toHaveLength(5);
+  });
 });
 
 

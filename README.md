@@ -69,7 +69,7 @@ Basic cards work without a key. A key adds counts, the picker, and import.
 
 ## Develop
 
-- Run `npm test` for unit tests (Vitest, 76 tests).
+- Run `npm test` for unit tests (Vitest, 77 tests).
 - Run `npm run build` for type check plus production bundle.
 - Pure logic lives in `src/playlist.ts` (no Logseq APIs).
 - Logseq wiring lives in `src/main.ts`. Styles live in `src/style.css`.

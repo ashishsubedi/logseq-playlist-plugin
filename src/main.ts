@@ -179,6 +179,12 @@ function openSearchModal() {
     if (!input || !resultsContainer) return;
     input.focus();
 
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        logseq.provideUI({ key: "ytpl-search-modal", template: "" });
+      }
+    });
+
     input.addEventListener("input", () => {
       const val = input.value.trim();
       const matches = searchCachedVideos(val);

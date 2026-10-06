@@ -225,7 +225,7 @@ export function clearCacheForTests(): void {
 }
 
 export function getAllCachedPlaylists(): PlaylistMeta[] {
-  const results: PlaylistMeta[] = [];
+  const map = new Map<string, PlaylistMeta>();
   try {
     const store = storage();
     if (store) {
@@ -235,32 +235,34 @@ export function getAllCachedPlaylists(): PlaylistMeta[] {
           const raw = store.getItem(k);
           if (raw) {
             try {
-              results.push(JSON.parse(raw) as PlaylistMeta);
+              const meta = JSON.parse(raw) as PlaylistMeta;
+              if (meta && meta.id) map.set(meta.id, meta);
             } catch {
               // ignore malformed JSON
             }
           }
         }
       }
-    } else {
-      for (const [k, v] of memCache.entries()) {
-        if (k.startsWith(CACHE_PREFIX)) {
-          try {
-            results.push(JSON.parse(v) as PlaylistMeta);
-          } catch {
-            // ignore malformed JSON
-          }
+    }
+    for (const [k, v] of memCache.entries()) {
+      if (k.startsWith(CACHE_PREFIX)) {
+        try {
+          const meta = JSON.parse(v) as PlaylistMeta;
+          if (meta && meta.id && !map.has(meta.id)) map.set(meta.id, meta);
+        } catch {
+          // ignore malformed JSON
         }
       }
     }
   } catch {
     // best-effort
   }
-  return results;
+  return Array.from(map.values());
 }
 
 export function searchCachedVideos(
-  query: string
+  query: string,
+  limit = 20
 ): Array<{ playlist: PlaylistMeta; video: VideoItem }> {
   const q = query.trim().toLowerCase();
   if (!q) return [];
@@ -274,6 +276,7 @@ export function searchCachedVideos(
         pl.title.toLowerCase().includes(q)
       ) {
         matches.push({ playlist: pl, video: item });
+        if (matches.length >= limit) return matches;
       }
     }
   }
