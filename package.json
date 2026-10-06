@@ -6,7 +6,7 @@
   "logseq": {
     "id": "logseq-yt-playlist-card",
     "title": "YouTube Playlist Card",
-    "icon": "./icon.png"
+    "icon": "./icon.jpg"
   },
   "scripts": {
     "dev": "vite",
