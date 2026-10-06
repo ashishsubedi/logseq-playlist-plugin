@@ -25,7 +25,7 @@ function rendererArgs(payload: { arguments?: string[] }): string[] {
   return payload.arguments ?? [];
 }
 
-async function renderCard(slot: string, blockUuid: string, url: string) {
+export async function renderCard(slot: string, blockUuid: string, url: string) {
   const id = parsePlaylistId(url);
   if (!id) return;
   try {
@@ -62,7 +62,7 @@ function registerRenderer() {
   });
 }
 
-async function addNote(slotUuid: string, url: string, title: string) {
+export async function addNote(slotUuid: string, url: string, title: string) {
   const content = noteBlockContent(title || "Playlist note", url);
   try {
     await logseq.Editor.insertBlock(slotUuid, content, { sibling: false });
@@ -85,7 +85,11 @@ async function addNote(slotUuid: string, url: string, title: string) {
 }
 
 function registerModel() {
-  logseq.provideModel({
+  logseq.provideModel(createModel());
+}
+
+export function createModel() {
+  return {
     async openYouTube(e: { dataset: { url?: string } }) {
       const url = (e.dataset.url ?? "").trim();
       if (!url || !isSafeExternalUrl(url)) return;
@@ -186,7 +190,7 @@ function registerModel() {
     async closeSearchModal() {
       logseq.provideUI({ key: "ytpl-search-modal", template: "" });
     },
-  });
+  };
 }
 
 function openSearchModal() {
